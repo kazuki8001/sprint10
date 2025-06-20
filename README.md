@@ -1,2 +1,3 @@
 Sprint10の課題です。
-InquiryStateMachine：Step Functionsのコード
+InquiryStateMachine.json：Step Functionsのコードです。
+ExecuteJob.py：ExecuteJobのコードです。

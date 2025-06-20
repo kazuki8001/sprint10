@@ -1,0 +1,69 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Lambda Invoke(JudgeCategory)",
+  "States": {
+    "Lambda Invoke(JudgeCategory)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:557690608573:function:JudgeCategory:$LATEST",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "IsQuestion"
+    },
+    "IsQuestion": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.category",
+          "StringEquals": "質問",
+          "Next": "Lambda Invoke(CreateAnswer)"
+        }
+      ],
+      "Default": "Done"
+    },
+    "Lambda Invoke(CreateAnswer)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:557690608573:function:CreateAnswer:$LATEST",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "End": true
+    },
+    "Done": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
